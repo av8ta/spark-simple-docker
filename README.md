@@ -6,6 +6,43 @@ It's not production-ready, it's for getting started quickly with Spark. Please s
 
 The cluster is run with `docker compose`. See [docker-compose.yml](./docker-compose.yml) to understand how it works. If you have an older version of docker compose installed you may need to change the command to `docker-compose up/down`. Since 2021 `compose` has been a subcommand of `docker`. This is how we use it below.
 
+## Quickstart
+
+Builds the scala code and spins up a spark cluster with docker:
+
+```shell
+docker compose up -d
+```
+
+Watch the scala-build logs
+
+```shell
+docker logs -f scalabuild
+```
+
+Once the build is complete and the spark-worker service is running, submit the job:
+
+```shell
+# In another shell
+./run.sh
+```
+
+See [output.csv](./output.csv) for the result.
+
+```shell
+docker compose down
+```
+
+<hr>
+
+## Manual building of scala code
+
+Useful for developing your scala app as builds are done locally. The target directory is mounted in the spark-worker service when the cluster is started.
+
+First [comment-out the scala-build service](./docker-compose.yml#36). You will also need to [comment out the `depends_on` key in the spark-worker service](./docker-compose.yml#32) or the worker will not start.
+
+Then follow the instructions below:
+
 ## Build the Scala project [AverageSales.scala](./src/main/scala/org/opensky/spark/exercise/AverageSales.scala) with [maven](https://maven.apache.org/)
 
 This Spark application written in Scala takes as input the file sales_data_sample.csv. It finds the average sales amount for each year by product code. Rounds the average to 2 decimal places while only considering records with status equal to 'Shipped'. The output is written to a CSV file named output.csv with headers YEAR_ID, PRODUCTLINE, AVERAGE_SALES_AMT and be ordered by YEAR_ID and PRODUCTLINE.

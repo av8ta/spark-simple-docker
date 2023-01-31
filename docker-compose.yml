@@ -1,26 +1,22 @@
 version: '2'
 
 services:
+
   spark:
     image: docker.io/bitnami/spark:3.3.1
     container_name: spark
-
     environment:
       - SPARK_MODE=master
       - SPARK_RPC_AUTHENTICATION_ENABLED=no
       - SPARK_RPC_ENCRYPTION_ENABLED=no
       - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
       - SPARK_SSL_ENABLED=no
-    volumes:
-      - ./data:/opt/bitnami/spark/work/data
-      - ./target:/opt/bitnami/spark/work/target
     ports:
       - '8080:8080'
 
   spark-worker:
     image: docker.io/bitnami/spark:3.3.1
     container_name: sparkworker
-
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark:7077
@@ -33,3 +29,14 @@ services:
     volumes:
       - ./data:/opt/bitnami/spark/work/data
       - ./target:/opt/bitnami/spark/work/target
+    depends_on:
+      scala-build:
+        condition: service_completed_successfully
+
+  scala-build:
+    image: maven:3.6.3-jdk-11-slim
+    container_name: scalabuild
+    volumes:
+      - ".:/opt/bitnami/spark/work"
+    working_dir: /opt/bitnami/spark/work
+    command: sh -c "mvn clean package"
