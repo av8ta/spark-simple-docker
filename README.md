@@ -8,6 +8,12 @@ The cluster is run with `docker compose`. See [docker-compose.yml](./docker-comp
 
 ## Quickstart
 
+First ensure the correct privileges on data directory.
+
+```shell
+chmod -R 777 data
+```
+
 Builds the scala code and spins up a spark cluster with docker:
 
 ```shell
